@@ -15,5 +15,9 @@ export const config = {
   mongoUri: process.env.MONGO_URI?.trim() || '',
   jwtSecret: process.env.JWT_SECRET || 'change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
+  resendApiKey: process.env.RESEND_API_KEY?.trim() || '',
+  emailFrom: process.env.EMAIL_FROM?.trim() || '',
+  emailFromName: process.env.EMAIL_FROM_NAME?.trim() || 'Pulsechat',
+  frontendUrl: process.env.FRONTEND_URL?.trim() || 'http://localhost:5173',
   __dirname,
 };

@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { config } from "../config/index.js";
+import { sendWelcomeEmail } from "../email/emailHandlers.js";
 
 /** Helper to generate JWT using central config */
 const generateToken = (id) => {
@@ -26,6 +27,12 @@ export const registerUser = async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashed });
     const token = generateToken(user._id);
+    // Send the welcome email without failing registration if email delivery fails.
+    try {
+      await sendWelcomeEmail(user.email, user.name, config.frontendUrl);
+    } catch (emailErr) {
+      console.warn("Welcome email failed:", emailErr);
+    }
     res
       .cookie("token", token, {
         httpOnly: true,
