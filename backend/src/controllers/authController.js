@@ -1,13 +1,17 @@
-import jwt from "jsonwebtoken";
+import { uploadToCloudinary } from "../lib/cloudinary.js";
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { config } from "../config/index.js";
 import { sendWelcomeEmail } from "../email/emailHandlers.js";
+import jwt from "jsonwebtoken";
 
 /** Helper to generate JWT using central config */
 const generateToken = (id) => {
-  return jwt.sign({ id }, config.jwtSecret, {
+  return jwt.sign({ sub: String(id) }, config.jwtSecret, {
+    algorithm: "HS256",
     expiresIn: config.jwtExpiresIn,
+    ...(config.jwtIssuer && { issuer: config.jwtIssuer }),
+    ...(config.jwtAudience && { audience: config.jwtAudience }),
   });
 };
 
@@ -95,8 +99,41 @@ export const loginUser = async (req, res) => {
 export const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.env === "production",
     sameSite: "strict",
   });
   res.status(200).json({ message: "Logged out" });
+};
+
+// Update profile picture for authenticated user using Cloudinary
+export const updateProfilePic = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    // Upload buffer to Cloudinary
+    const cloudResult = await uploadToCloudinary(req.file.buffer);
+    const profilePicUrl = cloudResult.secure_url;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: profilePicUrl },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };

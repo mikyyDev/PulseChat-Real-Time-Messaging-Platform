@@ -31,6 +31,10 @@ if (config.env === "production") {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 }
+// 404 handler for unknown API routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Not Found" });
+});
 
 // Error handling middleware (must be after routes)
 app.use(errorHandler);
