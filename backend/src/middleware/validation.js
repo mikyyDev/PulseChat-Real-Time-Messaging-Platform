@@ -27,3 +27,14 @@ export const validateLogin = [
     next();
   },
 ];
+export const validateProfilePic = (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+  // Optional: enforce mime types (already filtered by multer, but extra safety)
+  const allowed = ["image/jpeg", "image/png", "image/gif"];
+  if (!allowed.includes(req.file.mimetype)) {
+    return res.status(400).json({ message: "Invalid file type" });
+  }
+  next();
+};
