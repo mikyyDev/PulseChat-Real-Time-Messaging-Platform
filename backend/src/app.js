@@ -6,6 +6,7 @@ import path from "path";
 import messageRoutes from "./routes/message.route.js";
 import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.route.js";
+import { arcjetMiddleware } from "./middleware/arcjet.middleware.js";
 
 import { config } from "./config/index.js";
 import { connectDB } from "./config/db.js";
@@ -19,6 +20,9 @@ app.use(cookieParser());
 
 // Connect to MongoDB
 connectDB();
+
+// Global Arcjet security (Shield, Bot detection, Rate limiting) on all /api routes
+app.use("/api", arcjetMiddleware);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
