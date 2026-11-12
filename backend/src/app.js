@@ -21,8 +21,17 @@ app.use(cookieParser());
 // Connect to MongoDB
 connectDB();
 
+// Root health check (bypasses Arcjet so tools and monitoring always work)
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", message: "PulseChat backend is running" });
+});
+
 // Global Arcjet security (Shield, Bot detection, Rate limiting) on all /api routes
 app.use("/api", arcjetMiddleware);
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", message: "PulseChat API is healthy" });
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);

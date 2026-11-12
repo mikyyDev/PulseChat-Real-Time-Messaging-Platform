@@ -2,6 +2,12 @@ import { aj, messageLimiter } from "../lib/arcjet.js";
 
 // Express middleware: protects HTTP routes
 export const protectArcjet = async (req, res, next) => {
+  // Prevent duplicate execution if applied both globally and at the route level
+  if (req._arcjetChecked) {
+    return next();
+  }
+  req._arcjetChecked = true;
+
   try {
     const decision = await aj.protect(req);
 
