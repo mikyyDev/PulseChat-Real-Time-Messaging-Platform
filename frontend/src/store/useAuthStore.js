@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "../lib/api.js";
+import toast from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
@@ -28,13 +29,16 @@ export const useAuthStore = create((set) => ({
     try {
       const res = await api.post("/auth/register", data);
       set({ authUser: res.data });
+      toast.success("Account created successfully!");
       return { success: true, data: res.data };
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        err.response?.data?.errors?.[0]?.msg ||
-        "Failed to sign up. Please try again.";
+      const message = !err.response
+        ? "Cannot connect to the server. Check that the backend is running."
+        : err.response.data?.message ||
+          err.response.data?.errors?.[0]?.msg ||
+          "Failed to sign up. Please try again.";
       set({ error: message });
+      toast.error(message);
       return { success: false, error: message };
     } finally {
       set({ isSigningUp: false });
@@ -47,11 +51,13 @@ export const useAuthStore = create((set) => ({
     try {
       const res = await api.post("/auth/login", credentials);
       set({ authUser: res.data });
+      toast.success("Logged in successfully!");
       return { success: true, data: res.data };
     } catch (err) {
       const message =
         err.response?.data?.message || "Invalid credentials or server error.";
       set({ error: message });
+      toast.error(message);
       return { success: false, error: message };
     } finally {
       set({ isLoggingIn: false });
@@ -62,8 +68,10 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     try {
       await api.post("/auth/logout");
+      toast.success("Logged out successfully!");
     } catch (err) {
       console.warn("Logout request failed on server:", err);
+      toast.error("Error logging out from server");
     } finally {
       // Always reset local state to ensure the user is logged out in the UI
       set({ authUser: null, error: null });
@@ -84,11 +92,13 @@ export const useAuthStore = create((set) => ({
           ? { ...state.authUser, ...res.data }
           : res.data,
       }));
+      toast.success("Profile picture updated successfully!");
       return { success: true, data: res.data };
     } catch (err) {
       const message =
         err.response?.data?.message || "Failed to update profile picture.";
       set({ error: message });
+      toast.error(message);
       return { success: false, error: message };
     } finally {
       set({ isUpdatingProfile: false });
