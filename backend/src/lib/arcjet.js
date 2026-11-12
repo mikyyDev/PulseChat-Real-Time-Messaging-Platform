@@ -10,20 +10,22 @@ import { config } from "../config/index.js";
 // Custom client with 5s timeout to prevent latency timeouts in development
 const client = createRemoteClient({ timeout: 5000 });
 
+const isProd = (process.env.NODE_ENV?.trim() === "production");
+
 // HTTP protection (Shield, bot detection, IP rate limiting)
 export const aj = arcjet({
   key: config.arcjetApiKey || process.env.ARCJET_KEY,
   client,
   rules: [
     shield({
-      mode: process.env.NODE_ENV === "production" ? "LIVE" : "DRY_RUN",
+      mode: isProd ? "LIVE" : "DRY_RUN",
     }),
     detectBot({
-      mode: "LIVE",
-      allow: ["CATEGORY:SEARCH_ENGINE"],
+      mode: isProd ? "LIVE" : "DRY_RUN",
+      allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:MONITOR", "CATEGORY:TOOL"],
     }),
     slidingWindow({
-      mode: "LIVE",
+      mode: isProd ? "LIVE" : "DRY_RUN",
       interval: 60, // 60 seconds
       max: 60, // 60 requests per minute
     }),
