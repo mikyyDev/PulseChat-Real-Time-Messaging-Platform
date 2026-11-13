@@ -94,7 +94,7 @@ export default function SignUpPage() {
                 </label>
                 <div className="relative">
                   <User
-                    className={`pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
+                    className={`pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 transition-colors ${
                       errors.name ? "text-rose-400" : "text-slate-500"
                     }`}
                   />
@@ -135,7 +135,7 @@ export default function SignUpPage() {
                 </label>
                 <div className="relative">
                   <Mail
-                    className={`pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
+                    className={`pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 transition-colors ${
                       errors.email ? "text-rose-400" : "text-slate-500"
                     }`}
                   />
@@ -178,7 +178,7 @@ export default function SignUpPage() {
                 </label>
                 <div className="relative">
                   <Lock
-                    className={`pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
+                    className={`pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 transition-colors ${
                       errors.password ? "text-rose-400" : "text-slate-500"
                     }`}
                   />
@@ -208,9 +208,9 @@ export default function SignUpPage() {
                     }
                   >
                     {showPassword ? (
-                      <EyeOff className="h-[18px] w-[18px]" />
+                      <EyeOff className="h-4.5 w-4.5" />
                     ) : (
-                      <Eye className="h-[18px] w-[18px]" />
+                      <Eye className="h-4.5 w-4.5" />
                     )}
                   </button>
                 </div>
@@ -236,7 +236,7 @@ export default function SignUpPage() {
                 </label>
                 <div className="relative">
                   <Lock
-                    className={`pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
+                    className={`pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 transition-colors ${
                       errors.confirmPassword
                         ? "text-rose-400"
                         : "text-slate-500"
@@ -270,9 +270,9 @@ export default function SignUpPage() {
                     }
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-[18px] w-[18px]" />
+                      <EyeOff className="h-4.5 w-4.5" />
                     ) : (
-                      <Eye className="h-[18px] w-[18px]" />
+                      <Eye className="h-4.5 w-4.5" />
                     )}
                   </button>
                 </div>
