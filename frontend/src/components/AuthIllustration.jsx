@@ -12,7 +12,7 @@ export default function AuthIllustration() {
         <img
           src={illustrationImg}
           alt="PulseChat Community"
-          className="w-full max-w-[360px] sm:max-w-[420px] object-contain drop-shadow-[0_20px_40px_rgba(40,16,80,0.6)] transition-transform duration-700 ease-out hover:scale-105"
+          className="w-full max-w-90 sm:max-w-105 object-contain drop-shadow-[0_20px_40px_rgba(40,16,80,0.6)] transition-transform duration-700 ease-out hover:scale-105"
         />
       </div>
 
