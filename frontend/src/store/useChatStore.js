@@ -50,6 +50,8 @@ export const useChatStore = create((set, get) => ({
   isLoadingContacts: false,
   isLoadingMessages: false,
   isSendingMessage: false,
+  onlineUserIds: [],
+  typingUserId: null,
   error: null,
 
   /**
@@ -104,6 +106,7 @@ export const useChatStore = create((set, get) => ({
     set((state) => ({
       selectedUser: user,
       messages: [],
+      typingUserId: null,
       error: null,
       chats: state.chats.map((c) =>
         getUserId(c) === nextUserId ? { ...c, unreadCount: 0 } : c,
@@ -121,7 +124,12 @@ export const useChatStore = create((set, get) => ({
       activeMessageAbortController.abort();
       activeMessageAbortController = null;
     }
-    set({ selectedUser: null, messages: [], isLoadingMessages: false });
+    set({
+      selectedUser: null,
+      messages: [],
+      typingUserId: null,
+      isLoadingMessages: false,
+    });
   },
 
   /**
@@ -220,6 +228,67 @@ export const useChatStore = create((set, get) => ({
   },
 
   /**
+   * Applies the presence list pushed by the socket layer.
+   */
+  setOnlineUsers: (ids) => {
+    const normalized = Array.isArray(ids)
+      ? [...new Set(ids.map((id) => String(id)))]
+      : [];
+    set({ onlineUserIds: normalized });
+  },
+
+  /**
+   * Tracks who is typing in the conversation currently on screen.
+   */
+  setTypingUser: (userId, isTyping) =>
+    set((state) => {
+      const id = userId ? String(userId) : null;
+      if (!id) return {};
+
+      if (!isTyping) {
+        return state.typingUserId === id ? { typingUserId: null } : {};
+      }
+
+      // Typing events for other conversations are not displayed anywhere.
+      return getUserId(state.selectedUser) === id ? { typingUserId: id } : {};
+    }),
+
+  /**
+   * Applies a realtime message delivered over the socket.
+   * The event only targets the recipient, so `senderId` is the chat partner.
+   */
+  receiveMessage: (message) => {
+    const partnerId = message?.senderId ? String(message.senderId) : null;
+    if (!partnerId || !message?._id) return;
+
+    set((state) => {
+      const isOpenThread = getUserId(state.selectedUser) === partnerId;
+      const alreadyStored = state.messages.some(
+        (existing) => String(existing._id) === String(message._id),
+      );
+
+      const partner =
+        state.chats.find((chat) => getUserId(chat) === partnerId) ??
+        state.contacts.find((contact) => getUserId(contact) === partnerId);
+
+      return {
+        messages:
+          isOpenThread && !alreadyStored
+            ? [...state.messages, message]
+            : state.messages,
+        chats: partner
+          ? upsertConversation(state.chats, partner, message)
+          : state.chats,
+      };
+    });
+
+    // First message from someone new: pull the refreshed conversation list.
+    if (!get().chats.some((chat) => getUserId(chat) === partnerId)) {
+      get().fetchChats();
+    }
+  },
+
+  /**
    * Clears state on user logout.
    */
   resetChatStore: () => {
@@ -236,6 +305,8 @@ export const useChatStore = create((set, get) => ({
       isLoadingContacts: false,
       isLoadingMessages: false,
       isSendingMessage: false,
+      onlineUserIds: [],
+      typingUserId: null,
       error: null,
     });
   },

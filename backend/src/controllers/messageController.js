@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import Message from "../models/Message.js";
 import cloudinary from "../lib/cloudinary.js";
 import { checkMessageLimit } from "../middleware/arcjet.middleware.js";
+import { emitToUser, isUserOnline } from "../lib/socket.js";
 
 // Get all registered contacts (all users except currently logged-in user)
 // GET /api/messages/contacts
@@ -16,7 +17,13 @@ export const getContacts = async (req, res) => {
       .select("-password")
       .sort({ name: 1 });
 
-    res.status(200).json(contacts);
+    // Presence comes from the socket layer, so clients get a real online flag.
+    res.status(200).json(
+      contacts.map((contact) => ({
+        ...contact.toObject(),
+        isOnline: isUserOnline(contact._id),
+      })),
+    );
   } catch (error) {
     console.error("Error in getContacts:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -67,6 +74,7 @@ export const getChats = async (req, res) => {
 
         return {
           ...partner.toObject(),
+          isOnline: isUserOnline(partner._id),
           lastMessage: lastMessage
             ? {
                 text: lastMessage.text,
@@ -162,6 +170,9 @@ export const sendMessage = async (req, res) => {
     });
 
     await newMessage.save();
+
+    // Real-time delivery: fan out to every device the recipient has open.
+    emitToUser(receiverId, "newMessage", newMessage);
 
     res.status(201).json(newMessage);
   } catch (error) {
