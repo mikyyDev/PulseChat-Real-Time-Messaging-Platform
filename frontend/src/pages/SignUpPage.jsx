@@ -14,7 +14,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import AuthIllustration from "../components/AuthIllustration";
-import logo from "../asset/image/logo.webp";
+import PulseLogo from "../components/chat/PulseLogo";
 
 export default function SignUpPage() {
   const { signup, isSigningUp } = useAuthStore();
@@ -56,7 +56,7 @@ export default function SignUpPage() {
         {/* Navbar */}
         <nav className="flex items-center justify-between px-8 py-5">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="PulseChat" className="h-9 w-9 rounded-lg" />
+            <PulseLogo size={34} />
             <span className="text-xl font-bold tracking-tight text-white">
               PulseChat
             </span>

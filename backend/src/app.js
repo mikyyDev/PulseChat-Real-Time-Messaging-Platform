@@ -15,7 +15,7 @@ const app = express();
 
 // Global middlewares
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
 // Connect to MongoDB

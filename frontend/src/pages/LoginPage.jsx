@@ -6,7 +6,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { loginSchema } from "../schemas/auth.schema.js";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import AuthIllustration from "../components/AuthIllustration";
-import logo from "../asset/image/logo.webp";
+import PulseLogo from "../components/chat/PulseLogo";
 
 export default function LoginPage() {
   const { login, isLoggingIn } = useAuthStore();
@@ -38,7 +38,7 @@ export default function LoginPage() {
         {/* Navbar */}
         <nav className="flex items-center justify-between px-8 py-5">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="PulseChat" className="h-9 w-9 rounded-lg" />
+            <PulseLogo size={34} />
             <span className="text-xl font-bold tracking-tight text-white">
               PulseChat
             </span>
